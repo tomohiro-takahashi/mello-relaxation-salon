@@ -44,7 +44,7 @@ export function BookingForm({ therapistId }: { therapistId: string }) {
     }
   };
 
-  const GENERATED_TIME_SLOTS = ["18:00", "19:00", "20:00", "21:00", "22:00", "23:00", "00:00", "01:00", "02:00", "03:00"];
+  const GENERATED_TIME_SLOTS = ["20:00", "21:00", "22:00", "23:00", "00:00", "01:00", "02:00"];
 
   const handleDateChange = (date: string) => {
     setFormData({ ...formData, date, time: '' });
