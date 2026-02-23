@@ -199,7 +199,7 @@ export default function AvailabilityAdminPage() {
           {/* Availability Logic */}
           <div className="xl:col-span-2 space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <section className="bg-surface/30 border border-white/10 rounded-[2rem] p-8 space-y-6 backdrop-blur-xl">
+              <section className="bg-surface/30 border border-white/10 rounded-4xl p-8 space-y-6 backdrop-blur-xl">
                 <h2 className="flex items-center gap-2 text-primary font-bold tracking-widest uppercase text-xs">
                   <CalendarIcon size={16} />
                   Date Selection
@@ -221,7 +221,7 @@ export default function AvailabilityAdminPage() {
                 </div>
               </section>
 
-              <section className="bg-surface/30 border border-white/10 rounded-[2rem] p-8 space-y-8 backdrop-blur-xl">
+              <section className="bg-surface/30 border border-white/10 rounded-4xl p-8 space-y-8 backdrop-blur-xl">
                 <h2 className="flex items-center gap-2 text-primary font-bold tracking-widest uppercase text-xs">
                   <Clock size={16} />
                   Availability Slots
@@ -284,7 +284,7 @@ export default function AvailabilityAdminPage() {
             </div>
 
             {/* Booking List */}
-            <section className="bg-surface/30 border border-white/10 rounded-[2rem] p-8 space-y-6 backdrop-blur-xl overflow-hidden">
+            <section className="bg-surface/30 border border-white/10 rounded-4xl p-8 space-y-6 backdrop-blur-xl overflow-hidden">
                <h2 className="flex items-center gap-2 text-primary font-bold tracking-widest uppercase text-xs">
                   <CalendarCheck size={16} />
                   Recent Booking Requests
@@ -303,7 +303,7 @@ export default function AvailabilityAdminPage() {
                     </thead>
                     <tbody className="text-sm font-sans">
                       {bookings.length > 0 ? bookings.map((booking: any) => (
-                        <tr key={booking.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                        <tr key={booking.id} className="border-b border-white/5 hover:bg-white/2 transition-colors">
                           <td className="py-4 px-2 text-text-cream tabular-nums">{booking.date}</td>
                           <td className="py-4 px-2 text-text-cream tabular-nums font-bold">{booking.time}</td>
                           <td className="py-4 px-2">
