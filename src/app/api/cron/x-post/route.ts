@@ -28,22 +28,22 @@ export async function GET(req: Request) {
 
     const results = [];
 
-    // 3. 順次投稿
-    for (const post of pendingPosts) {
-      try {
-        let content = post.content;
+    // 3. バースト防止：1回の実行につき、最も古い予定の「1件のみ」を処理する
+    const post = pendingPosts[0];
+    const results = [];
 
-        // 本文が空でトピックがある場合は、その場で生成
-        if (!content && post.topic) {
-          content = await generateXPost(post.account, post.topic);
-        }
+    try {
+      let content = post.content;
 
-        if (!content) {
-          await updatePostStatus(post.rowIndex, 'Error', 'Content is empty');
-          results.push({ id: post.rowIndex, account: post.account, status: 'error', reason: 'Empty content' });
-          continue;
-        }
+      // 本文が空でトピックがある場合は、その場で生成
+      if (!content && post.topic) {
+        content = await generateXPost(post.account, post.topic);
+      }
 
+      if (!content) {
+        await updatePostStatus(post.rowIndex, 'Error', 'Content is empty');
+        results.push({ id: post.rowIndex, account: post.account, status: 'error', reason: 'Empty content' });
+      } else {
         // Xに投稿
         try {
           await sendXPost(post.account, content);
@@ -54,15 +54,15 @@ export async function GET(req: Request) {
             await updatePostStatus(post.rowIndex, 'Manual', 'Credentials missing - Ready for manual posting', content);
             results.push({ id: post.rowIndex, account: post.account, status: 'manual_skip' });
           } else {
-            throw err; // 再スローして catch (err: any) { ... } で処理
+            throw err;
           }
         }
-      } catch (err: any) {
-        console.error(`Failed to post for row ${post.rowIndex}:`, err);
-        const errorMessage = err.message || 'Unknown error';
-        await updatePostStatus(post.rowIndex, 'Error', errorMessage);
-        results.push({ id: post.rowIndex, account: post.account, status: 'error', reason: errorMessage });
       }
+    } catch (err: any) {
+      console.error(`Failed to post for row ${post.rowIndex}:`, err);
+      const errorMessage = err.message || 'Unknown error';
+      await updatePostStatus(post.rowIndex, 'Error', errorMessage);
+      results.push({ id: post.rowIndex, account: post.account, status: 'error', reason: errorMessage });
     }
 
     // 4. Discordへの結果通知（異常がある場合、または実行完了時）

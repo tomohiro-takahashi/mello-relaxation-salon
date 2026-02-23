@@ -64,6 +64,7 @@ export async function generateXPost(accountType: XAccountType, topic?: string) {
 - 140文字以内（推奨：60〜90文字前後）。
 - 「AIが書いた感」をゼロにする。
 - 挨拶やPRを省き、いきなり本質から書き始める。
+- 読みやすさのために「適度な改行」を入れてください。
 - 文末は「〜ですね」「〜かもしれません」「〜しています」等。`
   ]);
 
