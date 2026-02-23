@@ -59,7 +59,7 @@ export default function Features() {
           transition={{ duration: 0.8 }}
           className="text-text-cream tracking-tight text-3xl md:text-5xl font-serif font-bold leading-tight mb-6 px-4 md:px-0"
         >
-          楪（ゆずりは）が選ばれる、<br className="md:hidden" />
+          Mello（メロ）が選ばれる、<br className="md:hidden" />
           <span className="text-primary">3つの理由</span>
         </motion.h2>
         <motion.p 
@@ -147,7 +147,7 @@ export default function Features() {
         </button>
         <p className="text-text-muted/40 text-xs text-center leading-relaxed">
           ※初回カウンセリングは無料でお試しいただけます。<br />
-          あなたの心に寄り添う、楪（ゆずりは）の体験を。
+          あなたの心に寄り添う、Mello（メロ）の体験を。
         </p>
       </motion.div>
     </section>
