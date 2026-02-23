@@ -1,11 +1,13 @@
-'use client';
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, User, Mail, Phone, CheckCircle } from 'lucide-react';
+import { Calendar, Clock, User, Mail, Phone, CheckCircle, AlertTriangle } from 'lucide-react';
+
+const STATIC_TIME_SLOTS = ["19:00", "20:00", "21:00"];
 
 export function BookingForm({ therapistId }: { therapistId: string }) {
   const [step, setStep] = useState(1);
+  const [availability, setAvailability] = useState<any[]>([]);
+  const [availableSlots, setAvailableSlots] = useState<string[]>(STATIC_TIME_SLOTS);
   const [formData, setFormData] = useState({
     date: '',
     time: '',
@@ -15,7 +17,66 @@ export function BookingForm({ therapistId }: { therapistId: string }) {
     consent: false
   });
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [isInitLoading, setIsInitLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetchAvailability();
+  }, []);
+
+  const fetchAvailability = async () => {
+    try {
+      const res = await fetch('/api/admin/availability');
+      const data = await res.json();
+      setAvailability(data);
+    } catch (err) {
+      console.error('Failed to fetch availability:', err);
+    } finally {
+      setIsInitLoading(false);
+    }
+  };
+
+  const handleDateChange = (date: string) => {
+    setFormData({ ...formData, date, time: '' });
+    const config = availability.find(a => a.date === date);
+    if (config) {
+      const blocked = config.blockedSlots || [];
+      setAvailableSlots(STATIC_TIME_SLOTS.filter(s => !blocked.includes(s)));
+    } else {
+      setAvailableSlots(STATIC_TIME_SLOTS);
+    }
+  };
+
   const handleNext = () => setStep(prev => prev + 1);
+
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    setError('');
+    
+    // session_id を取得
+    const sessionId = localStorage.getItem('mello_session_id') || undefined;
+
+    try {
+      const res = await fetch('/api/booking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          therapistId,
+          sessionId
+        })
+      });
+
+      if (!res.ok) throw new Error('送信に失敗しました');
+
+      setStep(3);
+    } catch (err) {
+      setError('申し訳ありません。エラーが発生しました。時間を置いて再度お試しください。');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (step === 3) {
     return (
@@ -63,7 +124,7 @@ export function BookingForm({ therapistId }: { therapistId: string }) {
                 <input 
                   type="date" 
                   className="w-full bg-slate-900/50 border border-slate-700 rounded-xl py-3 pl-12 pr-4 focus:ring-1 focus:ring-[#D4AF37] outline-none transition-all"
-                  onChange={(e) => setFormData({...formData, date: e.target.value})}
+                  onChange={(e) => handleDateChange(e.target.value)}
                 />
               </div>
             </div>
@@ -73,14 +134,22 @@ export function BookingForm({ therapistId }: { therapistId: string }) {
                 <Clock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
                 <select 
                   className="w-full bg-slate-900/50 border border-slate-700 rounded-xl py-3 pl-12 pr-4 focus:ring-1 focus:ring-[#D4AF37] outline-none transition-all appearance-none"
+                  value={formData.time}
                   onChange={(e) => setFormData({...formData, time: e.target.value})}
+                  disabled={!formData.date}
                 >
-                  <option value="">選択してください</option>
-                  <option value="19:00">19:00</option>
-                  <option value="20:00">20:00</option>
-                  <option value="21:00">21:00</option>
+                  <option value="">{formData.date ? '時間を選択してください' : '先に日付を選択してください'}</option>
+                  {availableSlots.map(slot => (
+                    <option key={slot} value={slot}>{slot}</option>
+                  ))}
                 </select>
               </div>
+              {formData.date && availableSlots.length === 0 && (
+                <p className="text-[10px] text-red-400 flex items-center gap-1 mt-1 font-sans">
+                  <AlertTriangle size={12} />
+                  選択した日はすべての枠が埋まっています。
+                </p>
+              )}
             </div>
           </div>
           <button 
@@ -137,12 +206,16 @@ export function BookingForm({ therapistId }: { therapistId: string }) {
             </p>
           </div>
 
+          {error && (
+            <p className="text-red-400 text-xs text-center font-sans">{error}</p>
+          )}
+
           <button 
-            onClick={handleNext}
-            disabled={!formData.name || !formData.consent}
-            className="w-full py-4 bg-[#D4AF37] text-slate-900 rounded-xl font-bold transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+            onClick={handleSubmit}
+            disabled={!formData.name || !formData.consent || isLoading}
+            className="w-full py-4 bg-[#D4AF37] text-slate-900 rounded-xl font-bold transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center"
           >
-            予約を確定する
+            {isLoading ? '送信中...' : '予約を確定する'}
           </button>
         </motion.div>
       )}
