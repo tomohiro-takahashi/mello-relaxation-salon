@@ -90,9 +90,19 @@ export async function ensureAutonomousPosts() {
   const sheet = doc.sheetsByIndex[0];
   const rows = await sheet.getRows();
 
-  const today = new Date();
-  const todayStr = today.toISOString().split('T')[0];
-  const hasPostsToday = rows.some(row => row.get('ScheduleTime')?.startsWith(todayStr));
+  // JSTでの今日の日付文字列を取得 (YYYY-MM-DD)
+  const todayJst = new Date(today.getTime() + (9 * 60 * 60 * 1000));
+  const todayStr = todayJst.toISOString().split('T')[0];
+
+  // ヘッダーがない場合の初期化
+  if (rows.length === 0) {
+    await sheet.setHeaderRow(['ScheduleTime', 'Account', 'Content', 'Status', 'Topic', 'Log']);
+  }
+
+  const hasPostsToday = rows.some(row => {
+    const time = row.get('ScheduleTime');
+    return time && typeof time === 'string' && time.startsWith(todayStr);
+  });
 
   if (!hasPostsToday) {
     // 1日合計10ポスト（各5ポスト）を生成して予約
