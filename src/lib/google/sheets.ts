@@ -89,22 +89,40 @@ export async function ensureAutonomousPosts() {
   const doc = await getDoc();
   const sheet = doc.sheetsByIndex[0];
   const rows = await sheet.getRows();
-  
-  const today = new Date().toISOString().split('T')[0];
-  const hasPostsToday = rows.some(row => row.get('ScheduleTime')?.startsWith(today));
+
+  const today = new Date();
+  const todayStr = today.toISOString().split('T')[0];
+  const hasPostsToday = rows.some(row => row.get('ScheduleTime')?.startsWith(todayStr));
 
   if (!hasPostsToday) {
-    // オーナーと一ノ瀬、それぞれ1つずつ生成
-    const accounts: XAccountType[] = ['owner', 'ichinose'];
-    for (const account of accounts) {
-      const content = await generateXPost(account);
-      await sheet.addRow({
-        ScheduleTime: new Date().toISOString(),
-        Account: account,
-        Content: content,
-        Status: 'Pending',
-        Topic: 'AI Autonomous Generation'
-      });
-    }
+    // タイムゾーン（日本時間 JST）を考慮して時間を設定
+    // 一ノ瀬（朝の挨拶）: 09:00
+    // オーナー（夜の哲学）: 21:00
+    
+    // 一ノ瀬用
+    const ichinoseContent = await generateXPost('ichinose');
+    const ichinoseTime = new Date(today);
+    ichinoseTime.setHours(9, 0, 0, 0);
+    
+    await sheet.addRow({
+      ScheduleTime: ichinoseTime.toLocaleString('sv-SE').replace(' ', 'T'), // YYYY-MM-DDTHH:mm:ss 形式
+      Account: 'ichinose',
+      Content: ichinoseContent,
+      Status: 'Pending',
+      Topic: 'AI Autonomous Generation (Morning Message)'
+    });
+
+    // オーナー用
+    const ownerContent = await generateXPost('owner');
+    const ownerTime = new Date(today);
+    ownerTime.setHours(21, 0, 0, 0);
+
+    await sheet.addRow({
+      ScheduleTime: ownerTime.toLocaleString('sv-SE').replace(' ', 'T'),
+      Account: 'owner',
+      Content: ownerContent,
+      Status: 'Pending',
+      Topic: 'AI Autonomous Generation (Night Insight)'
+    });
   }
 }
