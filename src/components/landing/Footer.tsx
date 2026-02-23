@@ -38,7 +38,7 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-1">
             <div className="flex flex-col gap-6">
               <div className="text-primary font-serif tracking-[0.2em] text-lg font-bold uppercase transition-colors hover:text-primary/80">
-                楪（ゆずりは）
+                Mello
               </div>
               <p className="max-w-[240px] text-text-muted text-sm leading-relaxed">
                 あなただけの、プライベートな癒しを。
@@ -73,9 +73,7 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-text-muted/40 text-[10px] tracking-[0.2em] uppercase order-2 md:order-1">
-            © 2026 YUZURIHA WELLNESS GROUP. ALL RIGHTS RESERVED.
-          </p>
+          <p className="text-text-muted text-sm tracking-widest order-2 md:order-1">© 2026 Mello. All rights reserved.</p>
           <div className="flex items-center gap-6 order-1 md:order-2">
             <span className="text-text-muted/60 text-[10px] uppercase font-bold tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/10">
               営業許可 届出済み

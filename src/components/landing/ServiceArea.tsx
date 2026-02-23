@@ -33,7 +33,7 @@ export default function ServiceArea() {
                 あなたの元へ、<br />至福の時間を。
               </h2>
               <p className="text-text-muted text-base md:text-lg leading-relaxed font-light">
-                楪（ゆずりは）は、池袋・川口・大宮を中心とした<br className="hidden md:block" />
+                Mello（メロ）は、池袋・川口・大宮を中心とした<br className="hidden md:block" />
                 出張リラクゼーションサービスです。<br />
                 ご自宅やホテルへ、厳選されたセラピストが伺います。
               </p>

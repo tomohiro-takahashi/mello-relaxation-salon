@@ -4,45 +4,35 @@ description: 本番環境（Vercel）へのデプロイ手順
 
 # 本番環境（Vercel）デプロイフロー
 
-一ノ瀬チャットボットを本番環境で運用・テストするための手順です。
+Mello チャットボットを Vercel で運用するための手順です。Next.js に最適化されており、無料枠でサーバーサイド処理（一ノ瀬のAIロジックなど）を動かすことができます。
 
 ## 1. 準備：環境変数の設定
 
-Vercelの管理画面で以下の環境変数を設定してください。
-これらは `.env.local` に記述されているものと同じ値である必要があります。
+Vercel の管理画面で、ローカルの `.env.local` にある以下の値を設定してください。
 
-- `GEMINI_API_KEY`: Google Generative AIのリクエストに必要です。
-- `FIREBASE_PROJECT_ID`: FirebaseプロジェクトのID
-- `FIREBASE_CLIENT_EMAIL`: サービスアカウントのメールアドレス
-- `FIREBASE_PRIVATE_KEY`: サービスアカウントの秘密鍵（改行コード `\n` を含めて単一の文字列として設定してください）
+- `GEMINI_API_KEY`: AI の回答生成に必要です。
+- `FIREBASE_ADMIN_SERVICE_ACCOUNT`: Firebase データベースへの接続に必要です。（`.env.local` の JSON 文字列をそのままコピーしてください）
 
-## 2. GitHubへのプッシュ
+## 2. GitHub へのプッシュ
 
-ローカルでの変更をGitHubのリポジトリにプッシュします。
-
-// turbo
+ローカルの変更を GitHub のリポジトリにプッシュします。
 
 ```bash
 git add .
-git commit -m "feat: implement gap analysis logic and mobile optimizations"
+git commit -m "chore: prepare for Vercel deployment with Firebase database"
 git push origin main
 ```
 
-## 3. Vercelでのデプロイ実行
+※ リポジトリがまだない場合は、GitHub で新しいリポジトリを作成し、画面の指示に従って `git remote add origin ...` を実行してください。
 
-1. [Vercel Dashboard](https://vercel.com/dashboard) にアクセスします。
-2. 対象のプロジェクトを選択し、GitHubリポジトリと連携させます。
-3. `Deploy` をクリックしてビルドを開始します。
+## 3. Vercel でのデプロイ実行
 
-## 4. 動作確認
-
-デプロイ完了後、発行されたURL（例: `https://your-project.vercel.app/chat`）にアクセスし、以下の点を確認してください。
-
-- チャットが正しく開始されるか
-- 矛盾分析のフェーズ（提案→情報収集→結論）が意図通りに機能するか
-- スマホ表示でヘッダーが崩れていないか
+1. [Vercel Dashboard](https://vercel.com/dashboard) にログインします。
+2. `Add New` -> `Project` を選択し、上記のリポジトリをインポートします。
+3. `Environment Variables` のセクションで、手順1の変数を入力します。
+4. `Deploy` ボタンを押せば、数分でサイトが公開されます！
 
 ---
 
-> [!IMPORTANT]
-> 本番環境にデプロイすると、実際のFirebaseデータベースが更新されます。
+> [!TIP]
+> データベースは引き続き **Firebase (Firestore)** が使われます。Vercel にデプロイしても、これまでの会話履歴の保存ロジックはそのまま維持されます。

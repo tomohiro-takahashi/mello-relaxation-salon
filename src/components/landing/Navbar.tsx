@@ -65,7 +65,7 @@ export default function Navbar() {
 
           {/* Logo */}
           <Link href="/" className="text-primary font-serif tracking-[0.2em] text-xs font-bold uppercase">
-            楪（ゆずりは）
+            Mello
           </Link>
 
           {/* Chat Shortcut (Visible on scroll or always) */}
@@ -151,7 +151,7 @@ export default function Navbar() {
 
               {/* Footer info in menu */}
               <div className="pt-12 border-t border-white/5 text-center">
-                <p className="text-primary/60 font-serif text-sm tracking-widest mb-2">楪（ゆずりは）</p>
+                <p className="text-primary/60 font-serif text-sm tracking-widest mb-2">Mello</p>
                 <p className="text-white/20 text-[10px] tracking-widest uppercase italic">The Intersection of Relaxation & Instinct</p>
               </div>
             </div>

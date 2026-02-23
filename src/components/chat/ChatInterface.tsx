@@ -30,8 +30,8 @@ export function ChatInterface() {
 
   useEffect(() => {
     // セッションIDとユーザーIDの初期化（ブラウザ側のみ）
-    const savedSession = localStorage.getItem('yuzuriha_session_id');
-    const lastActivity = localStorage.getItem('yuzuriha_last_activity');
+    const savedSession = localStorage.getItem('mello_session_id');
+    const lastActivity = localStorage.getItem('mello_last_activity');
     const now = Date.now();
     const TWO_HOURS = 2 * 60 * 60 * 1000;
 
@@ -43,21 +43,21 @@ export function ChatInterface() {
       currentSessionId = savedSession;
     } else {
       currentSessionId = `session_${now}`;
-      localStorage.setItem('yuzuriha_session_id', currentSessionId);
+      localStorage.setItem('mello_session_id', currentSessionId);
     }
     setSessionId(currentSessionId);
-    localStorage.setItem('yuzuriha_last_activity', now.toString());
+    localStorage.setItem('mello_last_activity', now.toString());
 
-    const savedUser = localStorage.getItem('yuzuriha_user_id');
+    const savedUser = localStorage.getItem('mello_user_id');
     const currentUserId = savedUser || `user_${Math.random().toString(36).substr(2, 9)}`;
-    if (!savedUser) localStorage.setItem('yuzuriha_user_id', currentUserId);
+    if (!savedUser) localStorage.setItem('mello_user_id', currentUserId);
     setUserId(currentUserId);
     // Initial Greeting
     if (messages.length === 0) {
       setMessages([{
         id: 'initial',
         role: 'assistant',
-        content: 'こんにちは。リラクゼーションサロン楪（ゆずりは）マネージャーの一ノ瀬です。今日はどんな一日でしたか？何かお話ししたいことがあれば、ゆっくりと聞かせてくださいね。',
+        content: 'こんにちは。リラクゼーションサロン Mello（メロ）マネージャーの一ノ瀬です。今日はどんな一日でしたか？何かお話ししたいことがあれば、ゆっくりと聞かせてくださいね。',
         timestamp: new Date()
       }]);
     }
@@ -74,14 +74,14 @@ export function ChatInterface() {
 
   const handleReset = () => {
     if (confirm('会話をリセットして、最初からやり直しますか？')) {
-      localStorage.removeItem('yuzuriha_session_id');
+      localStorage.removeItem('mello_session_id');
       const newId = `session_${Date.now()}`;
-      localStorage.setItem('yuzuriha_session_id', newId);
+      localStorage.setItem('mello_session_id', newId);
       setSessionId(newId);
       setMessages([{
         id: 'initial',
         role: 'assistant',
-        content: 'こんにちは。リラクゼーションサロン楪（ゆずりは）マネージャーの一ノ瀬です。今日はどんな一日でしたか？何かお話ししたいことがあれば、ゆっくりと聞かせてくださいね。',
+        content: 'こんにちは。リラクゼーションサロン Mello（メロ）マネージャーの一ノ瀬です。今日はどんな一日でしたか？何かお話ししたいことがあれば、ゆっくりと聞かせてくださいね。',
         timestamp: new Date()
       }]);
       setIsLimitReached(false);
@@ -135,7 +135,7 @@ export function ChatInterface() {
       setMessages((prev) => [...prev, assistantMessage]);
 
       // 最終活動時刻を更新
-      localStorage.setItem('yuzuriha_last_activity', Date.now().toString());
+      localStorage.setItem('mello_last_activity', Date.now().toString());
 
       if (data.isLimitReached) {
         setIsLimitReached(true);

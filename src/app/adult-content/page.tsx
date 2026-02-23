@@ -14,7 +14,7 @@ export default function AdultContentPage() {
           animate={{ opacity: 1 }}
           className="text-primary font-serif text-2xl font-bold tracking-widest"
         >
-          楪 -YUZURIHA-
+          Mello -MELLO-
         </motion.div>
       </header>
 

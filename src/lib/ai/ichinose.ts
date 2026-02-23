@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { generateSystemPrompt, YUZURIHA_PERSONA_COMPLETE } from '../persona/yuzuriha-persona-complete';
+import { generateSystemPrompt, MELLO_PERSONA_COMPLETE } from '../persona/yuzuriha-persona-complete';
 import { Message, Conversation, ChatStage } from '@/types/database';
 
 let modelCache: any = null;
@@ -16,13 +16,13 @@ function getIchinoseModel() {
   const genAI = new GoogleGenerativeAI(apiKey);
   modelCache = genAI.getGenerativeModel({
     model: 'gemini-flash-latest',
-    systemInstruction: generateSystemPrompt(YUZURIHA_PERSONA_COMPLETE),
+    systemInstruction: generateSystemPrompt(MELLO_PERSONA_COMPLETE),
   });
   
   return modelCache;
 }
 
-const INITIAL_GREETING = 'こんにちは。リラクゼーションサロン楪（ゆずりは）マネージャーの一ノ瀬です。今日はどんな一日でしたか？何かお話ししたいことがあれば、ゆっくりと聞かせてくださいね。';
+const INITIAL_GREETING = 'こんにちは。リラクゼーションサロン Mello（メロ）マネージャーの一ノ瀬です。今日はどんな一日でしたか？何かお話ししたいことがあれば、ゆっくりと聞かせてくださいね。';
 
 /**
  * AI応答の生成とコンテキストの更新
@@ -61,7 +61,7 @@ export async function generateIchinoseResponse(
     }
 
     // 3. Stage情報を渡してシステムプロンプトを生成
-    const systemPrompt = generateSystemPrompt(YUZURIHA_PERSONA_COMPLETE, {
+    const systemPrompt = generateSystemPrompt(MELLO_PERSONA_COMPLETE, {
       performedGapAnalysis: conversation.summary.performedGapAnalysis,
       currentStage: currentStage,
     });

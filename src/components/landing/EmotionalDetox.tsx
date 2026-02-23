@@ -31,7 +31,7 @@ export default function EmotionalDetox() {
               <p className="text-text-muted text-sm md:text-lg leading-relaxed max-w-2xl mx-auto font-light">
                 理性を脱ぎ捨て、本能を解放することは、<br className="md:hidden" />
                 心の充足に直結します。<br />
-                リラクゼーションサロン楪（ゆずりは）では、<br className="md:hidden" />
+                リラクゼーションサロン Mello（メロ）では、<br className="md:hidden" />
                 マネージャーの一ノ瀬があなたの気持ちに寄り添います。<br />
                 まずは、あなたの心の重荷をここに置いていってください。
               </p>

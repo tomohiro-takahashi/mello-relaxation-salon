@@ -11,7 +11,7 @@ export default function AdultSection() {
     whileInView: { opacity: 1, y: 0 },
     viewport: { once: true },
     transition: { duration: 1, ease: "easeOut" }
-  };
+  } as const;
 
   return (
     <section id="adult-area" className="relative px-6 py-12 md:py-24 bg-background-dark overflow-hidden">

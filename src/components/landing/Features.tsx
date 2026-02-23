@@ -9,7 +9,7 @@ const features = [
     title: "事前カウンセリング",
     category: "Accessibility",
     subtitle: "まず、あなたの話を聞かせてください",
-    description: "予約前に、専任のマネージャーがあなたの気持ちに寄り添います。どんな悩みも、ここでなら安心して話せます。その上で、あなたに最適なセラピストをご提案。",
+    description: "Mello（メロ）では、単なるマッサージに留まらない、心の奥底に触れるカウンセリングを大切にしています。\nどんな悩みも、ここでなら安心して話せます。その上で、あなたに最適なセラピストをご提案。",
     icon: <MessageSquare className="text-primary" size={32} />,
     image: "/assets/landing/feature_counseling.png",
     benefits: [

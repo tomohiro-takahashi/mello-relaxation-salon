@@ -34,6 +34,9 @@ export default function ZoningBanner() {
               </div>
               
               <div className="space-y-8">
+                <h2 className="text-xl md:text-2xl font-serif font-bold tracking-widest text-text-cream italic">
+            Mello
+          </h2>
                 <h3 className="text-primary text-3xl md:text-5xl font-serif font-medium tracking-widest leading-tight">
                   理性を脱ぎ捨て、<br />本能が求める解放の詳細へ。
                 </h3>

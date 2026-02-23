@@ -12,7 +12,7 @@ const phases = [
     title: "開放：出口の清掃",
     subtitle: "Opening the Gateway",
     element: "Decollete & Neck",
-    description: "全身のリンパが合流する左鎖骨下を最初に開放します。それは、滞った流れを流すための「出口」を確保する作業。ホースの先端を空けるように、まずは全身の不純物が抜けていく準備を整えます。",
+    description: "Mello（メロ）の技術は、単なる揉みほぐしではありません。それは、滞った流れを流すための「出口」を確保する作業。ホースの先端を空けるように、まずは全身の不純物が抜けていく準備を整えます。",
     icon: <Wind className="text-primary" size={24} />,
     logic: "解剖学的アプローチ：鎖骨下静脈への還流促進"
   },
@@ -182,7 +182,7 @@ export default function TreatmentDetail() {
       {/* Final CTA */}
       <section className="py-32 px-6 bg-linear-to-b from-transparent to-primary/5 text-center">
         <div className="max-w-3xl mx-auto space-y-12">
-          <img src="/favicon.ico" alt="Yuzuriha Logo" className="w-12 h-12 mx-auto opacity-40 grayscale" />
+          <img src="/favicon.ico" alt="Mello Logo" className="w-12 h-12 mx-auto opacity-40 grayscale" />
           <h2 className="text-4xl md:text-5xl font-serif font-bold leading-tight">
             この理論の先にある、<br />
             言葉を超えた充足感を。

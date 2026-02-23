@@ -3,7 +3,7 @@
  * Part 2: 動機づけ面接、愛着理論、トラウマインフォームドケア、推論エンジン
  */
 
-export const YUZURIHA_PERSONA_PART2 = {
+export const MELLO_PERSONA_PART2 = {
   
   //=============================================================================
   // 3.3 動機づけ面接（Motivational Interviewing）
