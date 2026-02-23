@@ -136,7 +136,7 @@ export default function Pricing() {
 
               <div className="flex flex-col items-center gap-4">
                 <Link
-                  href="https://line.me"
+                  href="https://lin.ee/46p9yv9"
                   className="w-full max-w-md bg-[#06C755] text-white py-5 rounded-full font-bold tracking-widest hover:scale-105 transition-all shadow-[0_0_30px_rgba(6,199,85,0.3)] flex items-center justify-center gap-3"
                 >
                   <MessageCircle size={24} fill="currentColor" />

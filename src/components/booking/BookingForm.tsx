@@ -88,7 +88,7 @@ export function BookingForm({ therapistId }: { therapistId: string }) {
   };
 
   if (step === 3) {
-    const lineLink = `https://line.me/R/oaMessage/@line_id/?${encodeURIComponent(
+    const lineLink = `https://line.me/R/oaMessage/@410sprzz/?text=${encodeURIComponent(
       `予約リクエスト：${formData.name}様\n日時：${formData.date} ${formData.time}\nコース：${COURSES.find(c => c.id === formData.courseId)?.name || 'Standard'}`
     )}`;
 
