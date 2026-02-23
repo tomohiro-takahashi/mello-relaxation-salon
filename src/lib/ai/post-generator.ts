@@ -47,7 +47,7 @@ const ICHINOSE_SYSTEM_PROMPT = `
 `;
 
 export async function generateXPost(accountType: XAccountType, topic?: string) {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
   const systemPrompt = accountType === 'owner' ? OWNER_SYSTEM_PROMPT : ICHINOSE_SYSTEM_PROMPT;
   
   let promptBody = '';
