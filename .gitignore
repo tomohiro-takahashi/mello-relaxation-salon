@@ -39,3 +39,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# secrets
+*.json
+!package.json
+!tsconfig.json
+!next.config.ts
+!eslint.config.mjs
+!postcss.config.mjs
+
+# temp/zip
+*.zip
+models_list.json
+src 2/
