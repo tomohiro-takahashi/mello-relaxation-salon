@@ -13,7 +13,7 @@ export interface XPostItem {
   account: XAccountType;
   topic?: string;
   content?: string;
-  status: 'Pending' | 'Success' | 'Error';
+  status: 'Pending' | 'Success' | 'Error' | 'Manual';
 }
 
 async function getDoc() {
@@ -65,7 +65,7 @@ export async function getPendingPosts(): Promise<XPostItem[]> {
   }
 }
 
-export async function updatePostStatus(rowIndex: number, status: 'Success' | 'Error', log?: string, content?: string) {
+export async function updatePostStatus(rowIndex: number, status: 'Success' | 'Error' | 'Manual', log?: string, content?: string) {
   try {
     const doc = await getDoc();
     const sheet = doc.sheetsByIndex[0];

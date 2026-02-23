@@ -41,13 +41,20 @@ export async function GET(req: Request) {
           continue;
         }
 
-        // Xに投稿
-        await sendXPost(post.account, content);
-
-        // スプレッドシートを更新
-        await updatePostStatus(post.rowIndex, 'Success', undefined, content);
-        
-        results.push({ id: post.rowIndex, account: post.account, status: 'success' });
+        // Xに投稿（認証情報がない場合はスキップしてManualステータスにする）
+        try {
+          await sendXPost(post.account, content);
+          // スプレッドシートを更新
+          await updatePostStatus(post.rowIndex, 'Success', undefined, content);
+          results.push({ id: post.rowIndex, account: post.account, status: 'success' });
+        } catch (err: any) {
+          if (err.message.includes('Missing X API credentials')) {
+            await updatePostStatus(post.rowIndex, 'Manual', 'Credentials missing - Ready for manual posting', content);
+            results.push({ id: post.rowIndex, account: post.account, status: 'manual_skip' });
+          } else {
+            throw err;
+          }
+        }
       } catch (err: any) {
         console.error(`Failed to post for row ${post.rowIndex}:`, err);
         await updatePostStatus(post.rowIndex, 'Error', err.message);
