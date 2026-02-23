@@ -95,34 +95,40 @@ export async function ensureAutonomousPosts() {
   const hasPostsToday = rows.some(row => row.get('ScheduleTime')?.startsWith(todayStr));
 
   if (!hasPostsToday) {
-    // タイムゾーン（日本時間 JST）を考慮して時間を設定
-    // 一ノ瀬（朝の挨拶）: 09:00
-    // オーナー（夜の哲学）: 21:00
+    // 1日合計10ポスト（各5ポスト）を生成して予約
+    // 時間を分散させて不自然さをなくし、制限を守る
     
+    const ichinoseHours = [8, 11, 14, 18, 22]; // 癒やしタイム
+    const ownerHours = [9, 12, 16, 20, 23];    // インサイトタイム
+
     // 一ノ瀬用
-    const ichinoseContent = await generateXPost('ichinose');
-    const ichinoseTime = new Date(today);
-    ichinoseTime.setHours(9, 0, 0, 0);
-    
-    await sheet.addRow({
-      ScheduleTime: ichinoseTime.toLocaleString('sv-SE').replace(' ', 'T'), // YYYY-MM-DDTHH:mm:ss 形式
-      Account: 'ichinose',
-      Content: ichinoseContent,
-      Status: 'Pending',
-      Topic: 'AI Autonomous Generation (Morning Message)'
-    });
+    for (const hour of ichinoseHours) {
+      const content = await generateXPost('ichinose');
+      const time = new Date(today);
+      time.setHours(hour, 0, 0, 0);
+      
+      await sheet.addRow({
+        ScheduleTime: time.toLocaleString('sv-SE').replace(' ', 'T'),
+        Account: 'ichinose',
+        Content: content,
+        Status: 'Pending',
+        Topic: `AI Autonomous Generation (${hour}:00 Message)`
+      });
+    }
 
     // オーナー用
-    const ownerContent = await generateXPost('owner');
-    const ownerTime = new Date(today);
-    ownerTime.setHours(21, 0, 0, 0);
+    for (const hour of ownerHours) {
+      const content = await generateXPost('owner');
+      const time = new Date(today);
+      time.setHours(hour, 0, 0, 0);
 
-    await sheet.addRow({
-      ScheduleTime: ownerTime.toLocaleString('sv-SE').replace(' ', 'T'),
-      Account: 'owner',
-      Content: ownerContent,
-      Status: 'Pending',
-      Topic: 'AI Autonomous Generation (Night Insight)'
-    });
+      await sheet.addRow({
+        ScheduleTime: time.toLocaleString('sv-SE').replace(' ', 'T'),
+        Account: 'owner',
+        Content: content,
+        Status: 'Pending',
+        Topic: `AI Autonomous Generation (${hour}:00 Insight)`
+      });
+    }
   }
 }
