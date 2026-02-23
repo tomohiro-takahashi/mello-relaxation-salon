@@ -90,6 +90,7 @@ export async function ensureAutonomousPosts() {
   const sheet = doc.sheetsByIndex[0];
   const rows = await sheet.getRows();
 
+  const today = new Date();
   // JSTでの今日の日付文字列を取得 (YYYY-MM-DD)
   const todayJst = new Date(today.getTime() + (9 * 60 * 60 * 1000));
   const todayStr = todayJst.toISOString().split('T')[0];
