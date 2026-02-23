@@ -26,8 +26,6 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: 'No pending posts.' });
     }
 
-    const results = [];
-
     // 3. バースト防止：1回の実行につき、最も古い予定の「1件のみ」を処理する
     const post = pendingPosts[0];
     const results = [];
