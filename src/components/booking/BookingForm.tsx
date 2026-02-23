@@ -7,8 +7,9 @@ const STATIC_TIME_SLOTS = ["19:00", "20:00", "21:00"];
 export function BookingForm({ therapistId }: { therapistId: string }) {
   const [step, setStep] = useState(1);
   const [availability, setAvailability] = useState<any[]>([]);
-  const [availableSlots, setAvailableSlots] = useState<string[]>(STATIC_TIME_SLOTS);
+  const [availableSlots, setAvailableSlots] = useState<string[]>([]);
   const [formData, setFormData] = useState({
+    courseId: 'standard',
     date: '',
     time: '',
     name: '',
@@ -16,6 +17,12 @@ export function BookingForm({ therapistId }: { therapistId: string }) {
     phone: '',
     consent: false
   });
+
+  const COURSES = [
+    { id: 'trial', name: 'Trial', label: '90分 (+30分無料)', total: 120 },
+    { id: 'standard', name: 'Standard', label: '120分 (+30分無料)', total: 150 },
+    { id: 'premium', name: 'Premium', label: '150分 (+30分無料)', total: 180 }
+  ];
 
   const [isLoading, setIsLoading] = useState(false);
   const [isInitLoading, setIsInitLoading] = useState(true);
@@ -37,14 +44,16 @@ export function BookingForm({ therapistId }: { therapistId: string }) {
     }
   };
 
+  const GENERATED_TIME_SLOTS = ["18:00", "19:00", "20:00", "21:00", "22:00", "23:00", "00:00", "01:00", "02:00", "03:00"];
+
   const handleDateChange = (date: string) => {
     setFormData({ ...formData, date, time: '' });
     const config = availability.find(a => a.date === date);
     if (config) {
       const blocked = config.blockedSlots || [];
-      setAvailableSlots(STATIC_TIME_SLOTS.filter(s => !blocked.includes(s)));
+      setAvailableSlots(GENERATED_TIME_SLOTS.filter(s => !blocked.includes(s)));
     } else {
-      setAvailableSlots(STATIC_TIME_SLOTS);
+      setAvailableSlots(GENERATED_TIME_SLOTS);
     }
   };
 
@@ -116,6 +125,22 @@ export function BookingForm({ therapistId }: { therapistId: string }) {
 
       {step === 1 && (
         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+          <div className="space-y-2">
+            <label className="text-xs text-slate-400 uppercase tracking-widest">コース選択</label>
+            <div className="grid grid-cols-1 gap-3">
+              {COURSES.map(course => (
+                <button
+                  key={course.id}
+                  onClick={() => setFormData({...formData, courseId: course.id})}
+                  className={`flex justify-between items-center p-4 rounded-xl border transition-all ${formData.courseId === course.id ? 'bg-[#D4AF37]/10 border-[#D4AF37] text-[#D4AF37]' : 'bg-slate-900/50 border-slate-700 text-slate-400'}`}
+                >
+                  <span className="font-bold">{course.name}</span>
+                  <span className="text-xs">{course.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-xs text-slate-400 uppercase tracking-widest">希望日</label>

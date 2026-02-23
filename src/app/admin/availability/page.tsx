@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Calendar as CalendarIcon, Clock, Save, Loader2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 
-const TIME_SLOTS = ["19:00", "20:00", "21:00"];
+const TIME_SLOTS = ["18:00", "19:00", "20:00", "21:00", "22:00", "23:00", "00:00", "01:00", "02:00", "03:00"];
 
 export default function AvailabilityAdminPage() {
   const [availability, setAvailability] = useState<any[]>([]);
@@ -152,14 +152,26 @@ export default function AvailabilityAdminPage() {
         </div>
 
         {/* Note Panel */}
-        <div className="p-6 bg-white/5 border border-white/10 rounded-2xl flex items-start gap-4">
-          <AlertCircle className="text-primary shrink-0" size={20} />
-          <div className="space-y-2">
-            <h3 className="text-sm font-bold text-text-cream font-sans uppercase">Admin Notice</h3>
-            <p className="text-xs text-text-muted font-sans leading-relaxed">
-              ここでNGに設定した時間は、お客様の予約フォームから即座に非表示になります。<br />
-              突然の予定が入った際や、プライベートな時間として確保したい際にご利用ください。
-            </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="p-6 bg-white/5 border border-white/10 rounded-2xl flex items-start gap-4">
+            <AlertCircle className="text-primary shrink-0" size={20} />
+            <div className="space-y-2">
+              <h3 className="text-sm font-bold text-text-cream font-sans uppercase">Admin Notice</h3>
+              <p className="text-xs text-text-muted font-sans leading-relaxed">
+                ここでNGに設定した時間は、予約フォームから非表示になります。<br />
+                また、**新規予約が入ると前後1時間を含めて自動的にブロック**されます。
+              </p>
+            </div>
+          </div>
+          <div className="p-6 bg-white/5 border border-white/10 rounded-2xl flex items-start gap-4">
+            <Clock className="text-primary shrink-0" size={20} />
+            <div className="space-y-2">
+              <h3 className="text-sm font-bold text-text-cream font-sans uppercase">Business Hours</h3>
+              <p className="text-xs text-text-muted font-sans leading-relaxed">
+                現在の営業時間: **18:00 〜 翌04:00**<br />
+                ※ この時間外のスロットは予約フォームに表示されません。
+              </p>
+            </div>
           </div>
         </div>
       </div>
