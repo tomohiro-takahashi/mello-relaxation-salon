@@ -120,6 +120,9 @@ export default function AvailabilityAdminPage() {
     }
   };
 
+  const blockAll = () => setBlockedSlots([...TIME_SLOTS]);
+  const clearAll = () => setBlockedSlots([]);
+
   const handleLogout = () => {
     sessionStorage.removeItem('admin_authenticated');
     setIsAuthenticated(false);
@@ -223,6 +226,21 @@ export default function AvailabilityAdminPage() {
                   <Clock size={16} />
                   Availability Slots
                 </h2>
+                
+                <div className="flex gap-2 mb-4">
+                  <button 
+                    onClick={blockAll}
+                    className="flex-1 py-2 bg-red-500/10 text-red-400 border border-red-500/20 rounded-xl text-[10px] uppercase tracking-widest hover:bg-red-500/20 transition-all font-sans"
+                  >
+                    Block All
+                  </button>
+                  <button 
+                    onClick={clearAll}
+                    className="flex-1 py-2 bg-green-500/10 text-green-400 border border-green-500/20 rounded-xl text-[10px] uppercase tracking-widest hover:bg-green-500/20 transition-all font-sans"
+                  >
+                    Clear All
+                  </button>
+                </div>
                 
                 <div className="grid grid-cols-2 gap-3">
                   {TIME_SLOTS.map(slot => (

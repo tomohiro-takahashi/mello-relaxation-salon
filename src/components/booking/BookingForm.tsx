@@ -192,10 +192,25 @@ export function BookingForm({ therapistId }: { therapistId: string }) {
                 </select>
               </div>
               {formData.date && availableSlots.length === 0 && (
-                <p className="text-[10px] text-red-400 flex items-center gap-1 mt-1 font-sans">
-                  <AlertTriangle size={12} />
-                  選択した日はすべての枠が埋まっています。
-                </p>
+                <div className="space-y-3 mt-2">
+                  <p className="text-[10px] text-red-400 flex items-center gap-1 font-sans">
+                    <AlertTriangle size={12} />
+                    選択した日はすべての枠が埋まっています。
+                  </p>
+                  <a
+                    href={`https://line.me/R/oaMessage/@410sprzz/?text=${encodeURIComponent(
+                      `${formData.date}の予約に空きがなかったため、日程について相談したいです。`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full py-2 bg-[#06C755]/10 text-[#06C755] border border-[#06C755]/20 rounded-lg text-xs font-bold hover:bg-[#06C755]/20 transition-all"
+                  >
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                      <path d="M24 10.304c0-4.579-5.383-8.304-12-8.304s-12 3.725-12 8.304c0 4.105 4.27 7.545 10.04 8.204.391.084.924.258 1.058.592.121.303.079.778.038 1.082l-.164 1.001c-.05.3-.242 1.171 1.042.64 1.284-.531 6.923-4.077 9.444-6.98 1.769-2.035 2.542-4.06 2.542-6.089z"/>
+                    </svg>
+                    LINEで日程を相談する
+                  </a>
+                </div>
               )}
             </div>
           </div>
