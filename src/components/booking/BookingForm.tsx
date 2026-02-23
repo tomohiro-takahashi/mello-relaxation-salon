@@ -88,20 +88,42 @@ export function BookingForm({ therapistId }: { therapistId: string }) {
   };
 
   if (step === 3) {
+    const lineLink = `https://line.me/R/oaMessage/@line_id/?${encodeURIComponent(
+      `予約リクエスト：${formData.name}様\n日時：${formData.date} ${formData.time}\nコース：${COURSES.find(c => c.id === formData.courseId)?.name || 'Standard'}`
+    )}`;
+
     return (
       <motion.div 
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="text-center space-y-6 py-12"
+        className="text-center space-y-8 py-12"
       >
         <div className="w-20 h-20 bg-[#D4AF37]/20 rounded-full flex items-center justify-center mx-auto text-[#D4AF37]">
           <CheckCircle size={40} />
         </div>
-        <div className="space-y-2">
+        <div className="space-y-4">
           <h2 className="text-3xl font-light">予約リクエストを送信しました</h2>
-          <p className="text-slate-400 font-sans">
+          <p className="text-slate-400 font-sans leading-relaxed">
             担当者より、折り返し確認のご連絡を差し上げます。<br />
-            一ノ瀬とのお話の内容は、大切にセラピストへ共有されます。
+            よりスムーズな確認のため、以下のボタンから公式LINEへ<br className="hidden md:block" />
+            メッセージを送っていただけますと幸いです。
+          </p>
+        </div>
+
+        <div className="pt-4">
+          <a
+            href={lineLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 bg-[#06C755] text-white px-8 py-4 rounded-2xl font-bold hover:scale-105 transition-all shadow-lg"
+          >
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M24 10.304c0-4.579-5.383-8.304-12-8.304s-12 3.725-12 8.304c0 4.105 4.27 7.545 10.04 8.204.391.084.924.258 1.058.592.121.303.079.778.038 1.082l-.164 1.001c-.05.3-.242 1.171 1.042.64 1.284-.531 6.923-4.077 9.444-6.98 1.769-2.035 2.542-4.06 2.542-6.089z"/>
+            </svg>
+            LINEで予約を確定する
+          </a>
+          <p className="text-[10px] text-slate-500 mt-4 uppercase tracking-widest font-sans">
+            ※ボタンを押すと、予約内容が入力されたLINEが開きます
           </p>
         </div>
       </motion.div>
