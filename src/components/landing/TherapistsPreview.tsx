@@ -6,28 +6,28 @@ import Link from 'next/link';
 
 const therapists = [
   {
-    name: "Aoi",
-    tagline: "静かで落ち着いた、寄り添い型",
-    specialties: ["Deep Relaxation", "Emotional Care", "Silent Treatment"],
-    bio: "お客様のペースを何より大切にします。ゆっくり、静かに、あなたの疲れを癒します。",
-    image: "/assets/landing/therapist_aoi.png",
+    name: "Ichinose",
+    tagline: "マネージャー ｜ 寄り添い・カウンセリング",
+    specialties: ["Empathy", "Psychology", "Gap Analysis"],
+    bio: "あなたの本音に寄り添い、深層心理から癒やしを導き出します。",
+    image: "/images/therapist-1.jpg",
+    experience: "10年"
+  },
+  {
+    name: "Takuya",
+    tagline: "熟練の技術 ｜ 深層筋アプローチ",
+    specialties: ["Deep Tissue", "Anatomy", "Skillful Touch"],
+    bio: "解剖学に基づいた確かな技術で、体の芯から疲れを解きほぐします。",
+    image: "/images/therapist-2.jpg",
+    experience: "8年"
+  },
+  {
+    name: "Ren",
+    tagline: "安らぎの空間 ｜ ナチュラル・リフレッシュ",
+    specialties: ["Gentle Flow", "Aroma Therapy", "Natural Healing"],
+    bio: "穏やかな時間の中で、五感を研ぎ澄ます至福のひとときを提供します。",
+    image: "/images/therapist-3.jpg",
     experience: "5年"
-  },
-  {
-    name: "Yuki",
-    tagline: "会話を楽しみながら、心を軽く",
-    specialties: ["Conversational", "Empathetic", "Gentle Touch"],
-    bio: "お話しながら、少しずつ心を開いていただけたら嬉しいです。笑顔でお迎えします。",
-    image: "/assets/landing/therapist_yuki.png",
-    experience: "3年"
-  },
-  {
-    name: "Saki",
-    tagline: "リードしながら、包み込むケア",
-    specialties: ["Leadership", "Deep Tissue", "Intuitive"],
-    bio: "お任せいただければ、全てお預かりします。あなたは何も考えず、ただ委ねてください。",
-    image: "/assets/landing/therapist_saki.png",
-    experience: "7年"
   }
 ];
 
