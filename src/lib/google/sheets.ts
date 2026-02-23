@@ -96,15 +96,19 @@ export async function ensureAutonomousPosts() {
 
   if (!hasPostsToday) {
     // 1日合計10ポスト（各5ポスト）を生成して予約
-    // 時間を分散させて不自然さをなくし、制限を守る
+    // 営業時間（20:00 - 02:00）に合わせたスケジュール配置
     
-    const ichinoseHours = [8, 11, 14, 18, 22]; // 癒やしタイム
-    const ownerHours = [9, 12, 16, 20, 23];    // インサイトタイム
+    // 一ノ瀬: 感情に寄り添う / 予約への誘導
+    const ichinoseHours = [10, 14, 18, 22, 1]; 
+    // オーナー: 専門性 / 営業開始の空気感 / 哲学
+    const ownerHours = [12, 16, 20, 23, 2];   
 
     // 一ノ瀬用
     for (const hour of ichinoseHours) {
       const content = await generateXPost('ichinose');
       const time = new Date(today);
+      // 日を跨ぐ場合（1時、2時）の処理
+      if (hour < 5) time.setDate(time.getDate() + 1);
       time.setHours(hour, 0, 0, 0);
       
       await sheet.addRow({
@@ -112,7 +116,7 @@ export async function ensureAutonomousPosts() {
         Account: 'ichinose',
         Content: content,
         Status: 'Pending',
-        Topic: `AI Autonomous Generation (${hour}:00 Message)`
+        Topic: `AI Autonomous Generation (${hour < 5 ? 'Midnight' : hour}:00)`
       });
     }
 
@@ -120,6 +124,7 @@ export async function ensureAutonomousPosts() {
     for (const hour of ownerHours) {
       const content = await generateXPost('owner');
       const time = new Date(today);
+      if (hour < 5) time.setDate(time.getDate() + 1);
       time.setHours(hour, 0, 0, 0);
 
       await sheet.addRow({
@@ -127,7 +132,7 @@ export async function ensureAutonomousPosts() {
         Account: 'owner',
         Content: content,
         Status: 'Pending',
-        Topic: `AI Autonomous Generation (${hour}:00 Insight)`
+        Topic: `AI Autonomous Generation (${hour < 5 ? 'Midnight' : hour}:00)`
       });
     }
   }
