@@ -18,7 +18,8 @@ export interface XPostItem {
 
 async function getDoc() {
   const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+  // 改行コード（\n）を正しく処理する。
+  const privateKey = process.env.GOOGLE_PRIVATE_KEY?.split(String.raw`\n`).join('\n');
   const sheetId = process.env.GOOGLE_SHEET_ID_X_POSTS;
 
   if (!serviceAccountEmail || !privateKey || !sheetId) {
