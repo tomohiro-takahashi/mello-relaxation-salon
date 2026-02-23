@@ -48,3 +48,27 @@ ${data.message}
 ━━━━━━━━━━━━━━━━━━━━━━━━
   `.trim();
 }
+
+export function formatXCronResultMessage(results: any[]) {
+  const successCount = results.filter(r => r.status === 'success').length;
+  const errorCount = results.filter(r => r.status === 'error').length;
+  const manualCount = results.filter(r => r.status === 'manual_skip').length;
+  
+  let details = '';
+  results.forEach(r => {
+    const icon = r.status === 'success' ? '✅' : (r.status === 'error' ? '❌' : '⚠️');
+    details += `\n${icon} ${r.account || '不明'}: ${r.status}${r.reason ? ` (${r.reason})` : ''}`;
+  });
+
+  return `
+**🤖 X自動投稿 実行結果報告 [Mello]**
+━━━━━━━━━━━━━━━━━━━━━━━━
+✅ 成功: ${successCount}件
+⚠️ 手動待ち: ${manualCount}件
+❌ エラー: ${errorCount}件
+
+**【実行詳細】**${details}
+━━━━━━━━━━━━━━━━━━━━━━━━
+※ エラーが発生した場合は、GoogleスプレッドシートやXのデベロッパーポータルを確認してください。
+  `.trim();
+}

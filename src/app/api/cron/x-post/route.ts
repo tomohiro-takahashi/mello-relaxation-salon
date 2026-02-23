@@ -2,13 +2,16 @@ import { NextResponse } from 'next/server';
 import { getPendingPosts, updatePostStatus, ensureAutonomousPosts } from '@/lib/google/sheets';
 import { sendXPost } from '@/lib/x/client';
 import { generateXPost } from '@/lib/ai/post-generator';
+import { sendDiscordNotification, formatXCronResultMessage } from '@/lib/utils/notifications';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
-  // セキュリティチェック（Vercel Cronなどの場合は Authorization ヘッダーなどを確認）
+  // セキュリティチェック（Authorization ヘッダーを確認）
   const authHeader = req.headers.get('authorization');
-  if (process.env.NODE_ENV === 'production' && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const cronSecret = process.env.CRON_SECRET;
+  
+  if (process.env.NODE_ENV === 'production' && (!cronSecret || authHeader !== `Bearer ${cronSecret}`)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -30,21 +33,20 @@ export async function GET(req: Request) {
       try {
         let content = post.content;
 
-        // 本文が空でトピックがある場合は、その場で生成（念のためのフォールバック）
+        // 本文が空でトピックがある場合は、その場で生成
         if (!content && post.topic) {
           content = await generateXPost(post.account, post.topic);
         }
 
         if (!content) {
           await updatePostStatus(post.rowIndex, 'Error', 'Content is empty');
-          results.push({ id: post.rowIndex, status: 'error', reason: 'Empty content' });
+          results.push({ id: post.rowIndex, account: post.account, status: 'error', reason: 'Empty content' });
           continue;
         }
 
-        // Xに投稿（認証情報がない場合はスキップしてManualステータスにする）
+        // Xに投稿
         try {
           await sendXPost(post.account, content);
-          // スプレッドシートを更新
           await updatePostStatus(post.rowIndex, 'Success', undefined, content);
           results.push({ id: post.rowIndex, account: post.account, status: 'success' });
         } catch (err: any) {
@@ -52,19 +54,25 @@ export async function GET(req: Request) {
             await updatePostStatus(post.rowIndex, 'Manual', 'Credentials missing - Ready for manual posting', content);
             results.push({ id: post.rowIndex, account: post.account, status: 'manual_skip' });
           } else {
-            throw err;
+            throw err; // 再スローして catch (err: any) { ... } で処理
           }
         }
       } catch (err: any) {
         console.error(`Failed to post for row ${post.rowIndex}:`, err);
-        await updatePostStatus(post.rowIndex, 'Error', err.message);
-        results.push({ id: post.rowIndex, status: 'error', reason: err.message });
+        const errorMessage = err.message || 'Unknown error';
+        await updatePostStatus(post.rowIndex, 'Error', errorMessage);
+        results.push({ id: post.rowIndex, account: post.account, status: 'error', reason: errorMessage });
       }
     }
+
+    // 4. Discordへの結果通知（異常がある場合、または実行完了時）
+    const message = formatXCronResultMessage(results);
+    await sendDiscordNotification(message);
 
     return NextResponse.json({ results });
   } catch (err: any) {
     console.error('X Cron Error:', err);
+    await sendDiscordNotification(`🚨 **X Cron Job 重大エラー発生**\n${err.message}`);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
