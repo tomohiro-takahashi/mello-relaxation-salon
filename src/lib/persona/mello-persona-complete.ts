@@ -1,5 +1,5 @@
 /**
- * Serene AI Counselor - 統合ファイル
+ * Mello AI Counselor - 統合ファイル
  * 
  * 全パートを結合し、System Prompt生成関数を提供します。
  */

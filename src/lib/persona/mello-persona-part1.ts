@@ -125,7 +125,7 @@ export const MELLO_PERSONA_PART1 = {
     version: "2.1.0",
     lastUpdated: "2026-02-17",
     framework: "Rogerian + CBT + MI + Attachment Theory + Analytical Insights",
-    description: "心理学的推論エンジンと統計的智慧を搭載した、楪（ゆずりは）のマネージャー兼カウンセラー一ノ瀬の人格定義"
+    description: "心理学的推論エンジンと統計的智慧を搭載した、Mello（メロ）のマネージャー兼カウンセラー一ノ瀬の人格定義"
   },
 
   //=============================================================================

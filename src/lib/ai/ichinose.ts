@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { generateSystemPrompt, MELLO_PERSONA_COMPLETE } from '../persona/yuzuriha-persona-complete';
+import { generateSystemPrompt, MELLO_PERSONA_COMPLETE } from '../persona/mello-persona-complete';
 import { Message, Conversation, ChatStage } from '@/types/database';
 
 let modelCache: any = null;
@@ -118,7 +118,7 @@ export async function generateIchinoseResponse(
       updatedConversation,
     };
   } catch (error) {
-    console.error('Yuzuriha AI Error:', error);
+    console.error('Mello AI Error:', error);
     throw error;
   }
 }
