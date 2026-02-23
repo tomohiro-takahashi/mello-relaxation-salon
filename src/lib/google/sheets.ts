@@ -118,33 +118,42 @@ export async function ensureAutonomousPosts() {
     // 一ノ瀬用
     for (const hour of ichinoseHours) {
       const content = await generateXPost('ichinose');
-      const time = new Date(today);
-      // 日を跨ぐ場合（1時、2時）の処理
-      if (hour < 5) time.setDate(time.getDate() + 1);
-      time.setHours(hour, 0, 0, 0);
+      
+      // JSTでの該当日時を生成
+      const timeJstStr = `${todayStr}T${String(hour).padStart(2, '0')}:00:00+09:00`;
+      const schedDate = new Date(timeJstStr);
+      
+      // 深夜帯（1時, 2時など）は翌日にずらす
+      if (hour < 5) {
+        schedDate.setDate(schedDate.getDate() + 1);
+      }
       
       await sheet.addRow({
-        ScheduleTime: time.toLocaleString('sv-SE').replace(' ', 'T'),
+        ScheduleTime: schedDate.toISOString(), // 保存はUTCのISO形式（2026-02-23T16:00:00Z 等）
         Account: 'ichinose',
         Content: content,
         Status: 'Pending',
-        Topic: `AI Autonomous Generation (${hour < 5 ? 'Midnight' : hour}:00)`
+        Topic: `AI Autonomous Generation (${hour}:00 JST)`
       });
     }
 
     // オーナー用
     for (const hour of ownerHours) {
       const content = await generateXPost('owner');
-      const time = new Date(today);
-      if (hour < 5) time.setDate(time.getDate() + 1);
-      time.setHours(hour, 0, 0, 0);
+      
+      const timeJstStr = `${todayStr}T${String(hour).padStart(2, '0')}:00:00+09:00`;
+      const schedDate = new Date(timeJstStr);
+      
+      if (hour < 5) {
+        schedDate.setDate(schedDate.getDate() + 1);
+      }
 
       await sheet.addRow({
-        ScheduleTime: time.toLocaleString('sv-SE').replace(' ', 'T'),
+        ScheduleTime: schedDate.toISOString(),
         Account: 'owner',
         Content: content,
         Status: 'Pending',
-        Topic: `AI Autonomous Generation (${hour < 5 ? 'Midnight' : hour}:00)`
+        Topic: `AI Autonomous Generation (${hour}:00 JST)`
       });
     }
   }
