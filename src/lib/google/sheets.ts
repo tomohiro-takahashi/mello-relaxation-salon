@@ -16,7 +16,7 @@ export interface XPostItem {
   status: 'Pending' | 'Success' | 'Error' | 'Manual';
 }
 
-async function getDoc() {
+export async function getDoc() {
   const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
   // 改行コード（\n）を正しく処理する。
   const privateKey = process.env.GOOGLE_PRIVATE_KEY?.split(String.raw`\n`).join('\n');

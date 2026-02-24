@@ -37,10 +37,24 @@ const ICHINOSE_SYSTEM_PROMPT = `
   例：「今夜は少し冷えますね。温かい飲み物を用意して、チャットでお待ちしています。どんな小さな呟きでも大丈夫ですよ。」
 `;
 
+const OWNER_SCENARIOS = [
+  'タオルの絶妙な乾燥具合について', '新しいハーブティーの香りの立ち方', '施術室の椅子のわずかな高さの調整',
+  '雨の日の店内の静けさ', 'オイルの肌馴染みの違い', '朝一番に空気を入れる瞬間',
+  'お客様の靴がきれいに揃っているのを見た時', '名もなき家事（洗濯や掃除）の達成感'
+];
+
+const ICHINOSE_SCENARIOS = [
+  'コンビニの新作スイーツの感想', '通勤路で見つけた季節外れの花', '最近読んでいる本の一節',
+  'お気に入りの入浴剤の話', 'ちょっとした言い間違いをして笑ったこと', '雨上がりの空の色の変化',
+  '一日の終わりに飲む一杯の白湯', '誰かに「ありがとう」と言われた嬉しさ'
+];
+
 export async function generateXPost(accountType: XAccountType, topic?: string) {
   const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
   const systemPrompt = accountType === 'owner' ? OWNER_SYSTEM_PROMPT : ICHINOSE_SYSTEM_PROMPT;
-  
+  const scenarioPool = accountType === 'owner' ? OWNER_SCENARIOS : ICHINOSE_SCENARIOS;
+  const randomScenario = scenarioPool[Math.floor(Math.random() * scenarioPool.length)];
+
   let promptBody = '';
   if (topic && topic !== 'AI Autonomous Generation') {
     if (topic === '店舗の宣伝・予約状況') {
@@ -48,18 +62,23 @@ export async function generateXPost(accountType: XAccountType, topic?: string) {
     } else if (topic === 'Chat相談への誘導') {
       promptBody = `夜の孤独や不安について寄り添いつつ、「チャット」で話を聞く準備ができていることを伝えて。`;
     } else {
-      promptBody = `「${topic}」について、あなたのキャラクターでボソッと。`;
+      promptBody = `「${topic}」について、あなたのキャラクターで。`;
     }
   } else {
-    promptBody = `今日あった些細な出来事、道具の手入れ、あるいは「聞き手」として感じることについて独り言を。`;
+    promptBody = `テーマ：${randomScenario}。これについて、今ふと思ったことをボソッと。`;
   }
+
+  // 毎回異なる出力を得るためのランダムな「思考の種」
+  const seed = new Date().getTime();
 
   const result = await model.generateContent([
     systemPrompt,
     `【重要指示】
+- シード値: ${seed}（これに基づき、毎回異なる言い回しを考えてください）
 - ${promptBody}
 - 120文字以内（推奨：50〜80文字前後）。
-- ポエム・スピリチュアル・教訓・宣伝文句を完全に排除。
+- ポエム・スピリチュアル・教訓・「AI的なまとめ」を完全に排除。
+- 「お気に入りの〜」「〜ですね」などの特定の語尾や構文が連続しないよう、文構造に変化をつけて。
 - 【厳禁ワード】調律、浄化、宇宙、運命、解放、魂、意識のスイッチ、AI、自動生成。
 - 漢字を使いすぎず、柔らかい印象に。
 - 読みやすさのために適宜改行を入れる。`
