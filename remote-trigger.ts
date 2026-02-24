@@ -18,17 +18,9 @@ async function resetAndTrigger() {
   const sheet = doc.sheetsByIndex[0];
   const rows = await sheet.getRows();
 
-  console.log('--- Cleaning up old pending posts ---');
+  console.log('--- Clearing ALL rows to force regeneration ---');
   for (const row of rows) {
-    if (row.get('Status') === 'Pending') {
-      const time = row.get('ScheduleTime');
-      // 2026-02-24T05:00:00 以前のPendingを「Skipped」にする
-      if (time && new Date(time) < new Date('2026-02-23T20:00:00Z')) {
-        console.log(`Skipping old post: ${time}`);
-        row.set('Status', 'Skipped');
-        await row.save();
-      }
-    }
+    await row.delete();
   }
 
   console.log('--- Triggering API to generate today\'s posts ---');

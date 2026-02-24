@@ -19,7 +19,9 @@ async function check() {
 
   console.log('--- All Rows ---');
   rows.forEach((row, idx) => {
-    console.log(`${idx}: [${row.get('ScheduleTime')}] ${row.get('Account')}: ${row.get('Status')} | ${row.get('Topic')}`);
+    console.log(`${idx}: [${row.get('ScheduleTime')}] ${row.get('Account')}: ${row.get('Status')}`);
+    console.log(`   Content: ${row.get('Content')}`);
+    console.log(`   Topic: ${row.get('Topic')}`);
   });
 }
 
