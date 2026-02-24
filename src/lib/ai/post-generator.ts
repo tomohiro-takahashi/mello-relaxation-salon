@@ -43,9 +43,15 @@ export async function generateXPost(accountType: XAccountType, topic?: string) {
   
   let promptBody = '';
   if (topic && topic !== 'AI Autonomous Generation') {
-    promptBody = `「${topic}」について、あなたのキャラクターでボソッと。`;
+    if (topic === '店舗の宣伝・予約状況') {
+      promptBody = `今夜のサロンの空き状況や、静かな空間での休息を勧める「宣伝」を。いやらしくない程度に。`;
+    } else if (topic === 'Chat相談への誘導') {
+      promptBody = `夜の孤独や不安について寄り添いつつ、「チャット」で話を聞く準備ができていることを伝えて。`;
+    } else {
+      promptBody = `「${topic}」について、あなたのキャラクターでボソッと。`;
+    }
   } else {
-    promptBody = `今日あった些細な出来事や、今の空気感について独り言を。`;
+    promptBody = `今日あった些細な出来事、道具の手入れ、あるいは「聞き手」として感じることについて独り言を。`;
   }
 
   const result = await model.generateContent([
@@ -54,6 +60,7 @@ export async function generateXPost(accountType: XAccountType, topic?: string) {
 - ${promptBody}
 - 120文字以内（推奨：50〜80文字前後）。
 - ポエム・スピリチュアル・教訓・宣伝文句を完全に排除。
+- 【厳禁ワード】調律、浄化、宇宙、運命、解放、魂、意識のスイッチ、AI、自動生成。
 - 漢字を使いすぎず、柔らかい印象に。
 - 読みやすさのために適宜改行を入れる。`
   ]);

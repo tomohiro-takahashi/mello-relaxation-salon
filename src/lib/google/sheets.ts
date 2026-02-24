@@ -126,7 +126,9 @@ export async function ensureAutonomousPosts() {
 
     // 一ノ瀬用
     for (const hour of ichinoseHours) {
-      const content = await generateXPost('ichinose');
+      // 夜の22時と1時は「チャット宣伝」をテーマにする
+      const topic = (hour === 22 || hour === 1) ? 'Chat相談への誘導' : 'AI Autonomous Generation';
+      const content = await generateXPost('ichinose', topic);
       
       // JSTでの該当日時を生成
       const timeJstStr = `${todayStr}T${String(hour).padStart(2, '0')}:00:00+09:00`;
@@ -142,13 +144,15 @@ export async function ensureAutonomousPosts() {
         Account: 'ichinose',
         Content: content,
         Status: 'Pending',
-        Topic: `AI Autonomous Generation (${hour}:00 JST)`
+        Topic: topic === 'AI Autonomous Generation' ? `AI Autonomous Generation (${hour}:00 JST)` : topic
       });
     }
 
     // オーナー用
     for (const hour of ownerHours) {
-      const content = await generateXPost('owner');
+      // 20時と23時は「店舗宣伝・予約誘導」をテーマにする
+      const topic = (hour === 20 || hour === 23) ? '店舗の宣伝・予約状況' : 'AI Autonomous Generation';
+      const content = await generateXPost('owner', topic);
       
       const timeJstStr = `${todayStr}T${String(hour).padStart(2, '0')}:00:00+09:00`;
       const schedDate = new Date(timeJstStr);
@@ -162,7 +166,7 @@ export async function ensureAutonomousPosts() {
         Account: 'owner',
         Content: content,
         Status: 'Pending',
-        Topic: `AI Autonomous Generation (${hour}:00 JST)`
+        Topic: topic === 'AI Autonomous Generation' ? `AI Autonomous Generation (${hour}:00 JST)` : topic
       });
     }
   }
