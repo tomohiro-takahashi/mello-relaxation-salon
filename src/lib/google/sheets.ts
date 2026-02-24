@@ -103,7 +103,16 @@ export async function ensureAutonomousPosts() {
 
   const hasPostsToday = rows.some(row => {
     const time = row.get('ScheduleTime');
-    return time && typeof time === 'string' && time.startsWith(todayStr);
+    if (!time || typeof time !== 'string') return false;
+    
+    // 今日の日付 (YYYY-MM-DD) かつ 5:00 以降の投稿があるか確認
+    // 深夜1時・2時の投稿を「昨日の残り」として扱うため
+    const schedDate = new Date(time);
+    const jstDate = new Date(schedDate.getTime() + (9 * 60 * 60 * 1000));
+    const jstDateStr = jstDate.toISOString().split('T')[0];
+    const jstHour = jstDate.getUTCHours(); // JST基準で計算済み
+    
+    return jstDateStr === todayStr && jstHour >= 5;
   });
 
   if (!hasPostsToday) {
