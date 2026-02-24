@@ -93,8 +93,8 @@ export async function ensureAutonomousPosts() {
 
   const today = new Date();
   // JSTでの今日の日付文字列を取得 (YYYY-MM-DD)
-  const todayJst = new Date(today.getTime() + (9 * 60 * 60 * 1000));
-  const todayStr = todayJst.toISOString().split('T')[0];
+  const todayJst = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
+  const todayStr = `${todayJst.getFullYear()}-${String(todayJst.getMonth() + 1).padStart(2, '0')}-${String(todayJst.getDate()).padStart(2, '0')}`;
 
   // ヘッダーがない場合の初期化
   if (rows.length === 0) {
