@@ -98,7 +98,7 @@ export async function ensureAutonomousPosts() {
 
   // ヘッダーがない場合の初期化
   if (rows.length === 0) {
-    await sheet.setHeaderRow(['ScheduleTime', 'Account', 'Content', 'Status', 'Topic', 'Log']);
+    await sheet.setHeaderRow(['ScheduleTime', 'DisplayTimeJST', 'Account', 'Content', 'Status', 'Topic', 'Log']);
   }
 
   const hasPostsToday = rows.some(row => {
@@ -106,41 +106,42 @@ export async function ensureAutonomousPosts() {
     if (!time || typeof time !== 'string') return false;
     
     // 今日の日付 (YYYY-MM-DD) かつ 5:00 以降の投稿があるか確認
-    // 深夜1時・2時の投稿を「昨日の残り」として扱うため
     const schedDate = new Date(time);
     const jstDate = new Date(schedDate.getTime() + (9 * 60 * 60 * 1000));
     const jstDateStr = jstDate.toISOString().split('T')[0];
-    const jstHour = jstDate.getUTCHours(); // JST基準で計算済み
+    const jstHour = jstDate.getUTCHours();
     
     return jstDateStr === todayStr && jstHour >= 5;
   });
 
   if (!hasPostsToday) {
-    // 1日合計10ポスト（各5ポスト）を生成して予約
-    // 営業時間（20:00 - 02:00）に合わせたスケジュール配置
+    console.log(`Generating posts for ${todayStr}...`);
     
-    // 一ノ瀬: 感情に寄り添う / 予約への誘導
+    // 一ノ瀬: 10, 14, 18, 22, 1
     const ichinoseHours = [10, 14, 18, 22, 1]; 
-    // オーナー: 専門性 / 営業開始の空気感 / 哲学
+    // オーナー: 12, 16, 20, 23, 2
     const ownerHours = [12, 16, 20, 23, 2];   
 
     // 一ノ瀬用
     for (const hour of ichinoseHours) {
-      // 夜の22時と1時は「チャット宣伝」をテーマにする
       const topic = (hour === 22 || hour === 1) ? 'Chat相談への誘導' : 'AI Autonomous Generation';
-      const content = await generateXPost('ichinose', topic);
       
-      // JSTでの該当日時を生成
       const timeJstStr = `${todayStr}T${String(hour).padStart(2, '0')}:00:00+09:00`;
       const schedDate = new Date(timeJstStr);
-      
-      // 深夜帯（1時, 2時など）は翌日にずらす
-      if (hour < 5) {
-        schedDate.setDate(schedDate.getDate() + 1);
+      if (hour < 5) schedDate.setDate(schedDate.getDate() + 1);
+
+      // 過去の時間はスキップ
+      if (schedDate.getTime() <= now.getTime()) {
+        console.log(`Skipping past slot (Ichinose): ${schedDate.toISOString()}`);
+        continue;
       }
+
+      const content = await generateXPost('ichinose', topic);
+      const displayJst = schedDate.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
       
       await sheet.addRow({
-        ScheduleTime: schedDate.toISOString(), // 保存はUTCのISO形式（2026-02-23T16:00:00Z 等）
+        ScheduleTime: schedDate.toISOString(),
+        DisplayTimeJST: displayJst,
         Account: 'ichinose',
         Content: content,
         Status: 'Pending',
@@ -150,19 +151,24 @@ export async function ensureAutonomousPosts() {
 
     // オーナー用
     for (const hour of ownerHours) {
-      // 20時と23時は「店舗宣伝・予約誘導」をテーマにする
       const topic = (hour === 20 || hour === 23) ? '店舗の宣伝・予約状況' : 'AI Autonomous Generation';
-      const content = await generateXPost('owner', topic);
       
       const timeJstStr = `${todayStr}T${String(hour).padStart(2, '0')}:00:00+09:00`;
       const schedDate = new Date(timeJstStr);
-      
-      if (hour < 5) {
-        schedDate.setDate(schedDate.getDate() + 1);
+      if (hour < 5) schedDate.setDate(schedDate.getDate() + 1);
+
+      // 過去の時間はスキップ
+      if (schedDate.getTime() <= now.getTime()) {
+        console.log(`Skipping past slot (Owner): ${schedDate.toISOString()}`);
+        continue;
       }
+
+      const content = await generateXPost('owner', topic);
+      const displayJst = schedDate.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
 
       await sheet.addRow({
         ScheduleTime: schedDate.toISOString(),
+        DisplayTimeJST: displayJst,
         Account: 'owner',
         Content: content,
         Status: 'Pending',
