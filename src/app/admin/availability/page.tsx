@@ -134,7 +134,7 @@ export default function AvailabilityAdminPage() {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md bg-surface/30 border border-white/10 rounded-[2.5rem] p-10 backdrop-blur-3xl shadow-2xl"
+          className="w-full max-w-md bg-surface/30 border border-white/10 rounded-[40px] p-10 backdrop-blur-3xl shadow-2xl"
         >
           <div className="text-center space-y-4 mb-10">
             <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto text-primary">
@@ -340,7 +340,7 @@ export default function AvailabilityAdminPage() {
 
           {/* Quick Stats / Info Sidebar */}
           <div className="space-y-8">
-             <section className="bg-primary/10 border border-primary/20 rounded-[2rem] p-8 space-y-4">
+             <section className="bg-primary/10 border border-primary/20 rounded-4xl p-8 space-y-4">
                <h3 className="text-primary text-xs font-bold tracking-[0.2em] uppercase">Today's Summary</h3>
                <div className="space-y-6">
                   <div>
@@ -353,7 +353,7 @@ export default function AvailabilityAdminPage() {
                </div>
              </section>
 
-             <div className="p-6 bg-white/5 border border-white/10 rounded-[2rem] flex items-start gap-4">
+             <div className="p-6 bg-white/5 border border-white/10 rounded-4xl flex items-start gap-4">
               <AlertCircle className="text-primary shrink-0" size={18} />
               <div className="space-y-2">
                 <h3 className="text-[10px] font-bold text-text-cream font-sans uppercase tracking-widest">Security Notice</h3>

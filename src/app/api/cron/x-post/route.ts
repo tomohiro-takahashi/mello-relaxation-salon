@@ -10,9 +10,15 @@ export async function GET(req: Request) {
   // セキュリティチェック（Authorization ヘッダーを確認）
   const authHeader = req.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
-  
-  if (process.env.NODE_ENV === 'production' && (!cronSecret || authHeader !== `Bearer ${cronSecret}`)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  if (process.env.NODE_ENV === 'production') {
+    if (!cronSecret) {
+      console.warn('CRON_SECRET is not set in environment variables');
+    }
+    if (authHeader !== `Bearer ${cronSecret}`) {
+      console.error('Unauthorized cron access attempt');
+      return NextResponse.json({ error: 'Unauthorized', debug: 'Authorization header mismatch' }, { status: 401 });
+    }
   }
 
   try {

@@ -48,6 +48,13 @@ export function BookingForm({ therapistId }: { therapistId: string }) {
 
   const handleDateChange = (date: string) => {
     setFormData({ ...formData, date, time: '' });
+    
+    // 3月末までは一括で満室扱いにする
+    if (date && date <= '2026-03-31') {
+      setAvailableSlots([]);
+      return;
+    }
+
     const config = availability.find(a => a.date === date);
     if (config) {
       const blocked = config.blockedSlots || [];
@@ -132,7 +139,7 @@ export function BookingForm({ therapistId }: { therapistId: string }) {
 
   return (
     <div className="max-w-2xl mx-auto bg-slate-800/30 border border-slate-700/50 rounded-3xl p-8 backdrop-blur-md">
-      <div className="flex justify-between mb-12">
+      <div className="flex justify-between mb-8">
         {[1, 2].map(i => (
           <div key={i} className="flex items-center gap-2">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${step >= i ? 'bg-[#D4AF37] text-slate-900 font-bold' : 'bg-slate-700 text-slate-400'}`}>
@@ -143,6 +150,19 @@ export function BookingForm({ therapistId }: { therapistId: string }) {
             </span>
           </div>
         ))}
+      </div>
+
+      {/* 3月末までのアナウンス */}
+      <div className="mb-8 p-4 bg-[#D4AF37]/10 border border-[#D4AF37]/20 rounded-2xl">
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="text-[#D4AF37] shrink-0 mt-0.5" size={18} />
+          <div className="space-y-1">
+            <p className="text-sm font-bold text-[#D4AF37]">3月末までの予約状況について</p>
+            <p className="text-[11px] text-slate-400 leading-relaxed font-sans">
+              3月末までは現在すべての予約枠が埋まっております。キャンセル待ちのお申し込みや、お急ぎのご相談は公式LINEより直接お問い合わせください。
+            </p>
+          </div>
+        </div>
       </div>
 
       {step === 1 && (
@@ -195,11 +215,15 @@ export function BookingForm({ therapistId }: { therapistId: string }) {
                 <div className="space-y-3 mt-2">
                   <p className="text-[10px] text-red-400 flex items-center gap-1 font-sans">
                     <AlertTriangle size={12} />
-                    選択した日はすべての枠が埋まっています。
+                    {formData.date <= '2026-03-31' 
+                      ? "3月末までは現在すべての枠が埋まっております。" 
+                      : "選択した日はすべての枠が埋まっています。"}
                   </p>
                   <a
                     href={`https://line.me/R/oaMessage/@410sprzz/?text=${encodeURIComponent(
-                      `${formData.date}の予約に空きがなかったため、日程について相談したいです。`
+                      formData.date <= '2026-03-31'
+                        ? `3月末までの予約状況について相談したいです。`
+                        : `${formData.date}の予約に空きがなかったため、日程について相談したいです。`
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -208,7 +232,7 @@ export function BookingForm({ therapistId }: { therapistId: string }) {
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
                       <path d="M24 10.304c0-4.579-5.383-8.304-12-8.304s-12 3.725-12 8.304c0 4.105 4.27 7.545 10.04 8.204.391.084.924.258 1.058.592.121.303.079.778.038 1.082l-.164 1.001c-.05.3-.242 1.171 1.042.64 1.284-.531 6.923-4.077 9.444-6.98 1.769-2.035 2.542-4.06 2.542-6.089z"/>
                     </svg>
-                    LINEで日程を相談する
+                    LINEで{formData.date <= '2026-03-31' ? '詳細を確認' : '日程を相談'}する
                   </a>
                 </div>
               )}

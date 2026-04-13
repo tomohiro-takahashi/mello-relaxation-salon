@@ -57,3 +57,12 @@ firebase.json
 *.zip
 models_list.json
 src 2/
+
+# x-bot
+x-bot/chrome-profile-*/
+x-bot/node_modules/
+x-bot/.scheduler_state.json
+x-bot/.analytics_data.json
+x-bot/.browser_lock
+x-bot/.env
+x-bot/dist/

@@ -58,7 +58,17 @@ export async function getPendingPosts(): Promise<XPostItem[]> {
       .filter(post => {
         if (post.status !== 'Pending') return false;
         if (!post.scheduleTime) return true; // 時間指定がなければ即座に対象
-        return new Date(post.scheduleTime) <= now;
+        
+        const scheduleDate = new Date(post.scheduleTime);
+        // 安全策：現在時刻より12時間以上前の投稿は無視する（バックログ爆発防止）
+        const twelveHoursAgo = new Date(now.getTime() - (12 * 60 * 60 * 1000));
+        
+        if (scheduleDate < twelveHoursAgo) {
+          console.log(`Skipping old post (Row ${post.rowIndex}): ${post.scheduleTime}`);
+          return false;
+        }
+
+        return scheduleDate <= now;
       }) as any;
   } catch (err) {
     console.error('Error fetching pending posts:', err);

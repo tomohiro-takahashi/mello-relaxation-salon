@@ -1,0 +1,23 @@
+{
+  "name": "mello-x-bot",
+  "version": "1.0.0",
+  "description": "Mello X (Twitter) automation bot - @Mello_ichinose",
+  "scripts": {
+    "start": "tsx scheduler.ts schedule",
+    "now": "tsx scheduler.ts now",
+    "dry-run": "tsx scheduler.ts dry-run",
+    "test-generate": "tsx scheduler.ts test-generate",
+    "test-analytics": "tsx scheduler.ts test-analytics",
+    "login": "tsx scheduler.ts login"
+  },
+  "dependencies": {
+    "playwright": "^1.52.0",
+    "@google/generative-ai": "^0.24.1",
+    "dotenv": "^16.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0",
+    "tsx": "^4.19.0"
+  }
+}
