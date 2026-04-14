@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 import { z } from 'zod';
 
-const MAX_MESSAGES_PER_SESSION = 60; // 往復30回
+const MAX_MESSAGES_PER_SESSION = 100; // 往復50回
 
 const ChatRequestSchema = z.object({
   message: z.string().min(1).max(2000),

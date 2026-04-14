@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MessageSquare, Users, TrendingUp, DollarSign, RefreshCcw, ArrowLeft } from 'lucide-react';
+import { MessageSquare, Users, TrendingUp, DollarSign, RefreshCcw, ArrowLeft, Lock } from 'lucide-react';
 
 interface ChatStats {
   summary: {
@@ -33,27 +33,65 @@ const STAGE_LABELS: Record<string, string> = {
 
 export default function ChatStatsPage() {
   const [stats, setStats] = useState<ChatStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // ── 認証 ──
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [authChecking, setAuthChecking] = useState(true);
+
+  // 保存済みのパスワードチェック
+  useEffect(() => {
+    const saved = localStorage.getItem('admin_password');
+    if (saved) {
+      verifyPassword(saved);
+    } else {
+      setAuthChecking(false);
+    }
+  }, []);
+
+  const verifyPassword = async (pw: string) => {
+    try {
+      const res = await fetch('/api/admin/chat-stats', {
+        headers: { Authorization: `Bearer ${pw}` },
+      });
+      if (res.ok) {
+        localStorage.setItem('admin_password', pw);
+        setIsAuthenticated(true);
+        const data = await res.json();
+        setStats(data);
+      } else {
+        localStorage.removeItem('admin_password');
+        setAuthError('パスワードが正しくありません');
+      }
+    } catch {
+      setAuthError('通信エラーが発生しました');
+    } finally {
+      setAuthChecking(false);
+    }
+  };
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError('');
+    setAuthChecking(true);
+    verifyPassword(password);
+  };
 
   const fetchStats = async () => {
     setLoading(true);
     setError('');
     try {
-      const password = localStorage.getItem('admin_password');
-      if (!password) {
-        setError('管理者パスワードが必要です。/admin からログインしてください。');
-        setLoading(false);
-        return;
-      }
-
+      const pw = localStorage.getItem('admin_password');
       const res = await fetch('/api/admin/chat-stats', {
-        headers: { Authorization: `Bearer ${password}` },
+        headers: { Authorization: `Bearer ${pw}` },
       });
 
       if (res.status === 401) {
-        setError('認証エラー: 管理者パスワードが正しくありません。');
-        setLoading(false);
+        setIsAuthenticated(false);
+        localStorage.removeItem('admin_password');
         return;
       }
 
@@ -68,15 +106,56 @@ export default function ChatStatsPage() {
     }
   };
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
   const formatDate = (iso: string) => {
     const d = new Date(iso);
     return d.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
   };
 
+  // ── ローディング ──
+  if (authChecking) {
+    return (
+      <div className="min-h-screen bg-[#1A1A2E] flex items-center justify-center">
+        <RefreshCcw size={24} className="animate-spin text-gray-500" />
+      </div>
+    );
+  }
+
+  // ── 認証画面 ──
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#1A1A2E] text-gray-100 flex items-center justify-center p-6">
+        <div className="w-full max-w-sm space-y-6">
+          <div className="text-center space-y-3">
+            <div className="size-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto">
+              <Lock size={24} className="text-gray-400" />
+            </div>
+            <h1 className="text-xl font-bold tracking-wider">管理者認証</h1>
+            <p className="text-sm text-gray-500">チャット統計の閲覧には管理者パスワードが必要です</p>
+          </div>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <input
+              type="password"
+              placeholder="管理者パスワード"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-gray-100 placeholder-gray-600 focus:outline-none focus:border-blue-500/50 transition-all text-sm"
+            />
+            {authError && (
+              <p className="text-red-400 text-xs text-center">{authError}</p>
+            )}
+            <button
+              type="submit"
+              className="w-full h-12 bg-white/10 hover:bg-white/15 border border-white/10 rounded-xl font-bold tracking-widest transition-all text-sm"
+            >
+              ログイン
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // ── ダッシュボード ──
   return (
     <div className="min-h-screen bg-[#1A1A2E] text-gray-100 p-6 md:p-10">
       <div className="max-w-5xl mx-auto space-y-8">
