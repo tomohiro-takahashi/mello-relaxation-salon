@@ -19,6 +19,8 @@ export type ChatStage =
 export interface Conversation {
   id: string;
   userId: string;
+  userName?: string;
+  userEmail?: string;
   messages: Message[];
   summary: {
     emotionalState: string[]; // detected: loneliness, exhaustion, anxiety, etc.

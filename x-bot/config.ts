@@ -72,8 +72,8 @@ export const CONFIG: XBotConfig = {
     handle: '@Mello_ichinose',
     displayName: '一ノ瀬｜Mello',
     profileDir: './chrome-profile-x-ichinose',
-    domain: 'mello-relaxation.vercel.app',
-    chatUrl: 'https://mello-relaxation.vercel.app/contact',
+    domain: 'mello-relaxation-salon.vercel.app',
+    chatUrl: 'https://mello-relaxation-salon.vercel.app/contact',
 
     // ── いいね用キーワード ──
     // 個人が感情でつぶやくキーワードのみ（お店のツイートが出にくい）

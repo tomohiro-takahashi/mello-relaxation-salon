@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, User, Sparkles, AlertCircle, RefreshCcw } from 'lucide-react';
+import { Send, User, Sparkles, AlertCircle, RefreshCcw, Mail, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { nanoid } from 'nanoid';
 import { useMessageThrottle } from '@/hooks/useMessageThrottle';
@@ -14,6 +14,11 @@ interface ChatMessage {
   timestamp: Date;
 }
 
+interface UserInfo {
+  name: string;
+  email: string;
+}
+
 export function ChatInterface() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -23,19 +28,40 @@ export function ChatInterface() {
   const [sessionId, setSessionId] = useState('');
   const [userId, setUserId] = useState('');
 
+  // ── ゲート（名前・メール入力） ──
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [gateForm, setGateForm] = useState({ name: '', email: '' });
+  const [gateError, setGateError] = useState('');
+  const [isGateLoading, setIsGateLoading] = useState(true); // 初期ロード中
+
   const { isBlocked, warning, checkThrottle } = useMessageThrottle();
   
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  // ── 初期化：保存済みのユーザー情報を確認 ──
   useEffect(() => {
-    // セッションIDとユーザーIDの初期化（ブラウザ側のみ）
+    const savedInfo = localStorage.getItem('mello_user_info');
+    if (savedInfo) {
+      try {
+        const parsed = JSON.parse(savedInfo) as UserInfo;
+        if (parsed.name && parsed.email) {
+          setUserInfo(parsed);
+        }
+      } catch {}
+    }
+    setIsGateLoading(false);
+  }, []);
+
+  // ── ユーザー情報確定後のセッション初期化 ──
+  useEffect(() => {
+    if (!userInfo) return;
+
     const savedSession = localStorage.getItem('mello_session_id');
     const lastActivity = localStorage.getItem('mello_last_activity');
     const now = Date.now();
     const TWO_HOURS = 2 * 60 * 60 * 1000;
 
-    // 2時間以上経過している場合はセッションをリセット
     const isExpired = lastActivity && (now - parseInt(lastActivity)) > TWO_HOURS;
     
     let currentSessionId: string;
@@ -52,16 +78,39 @@ export function ChatInterface() {
     const currentUserId = savedUser || `user_${Math.random().toString(36).substr(2, 9)}`;
     if (!savedUser) localStorage.setItem('mello_user_id', currentUserId);
     setUserId(currentUserId);
+
     // Initial Greeting
     if (messages.length === 0) {
       setMessages([{
         id: 'initial',
         role: 'assistant',
-        content: 'こんにちは。リラクゼーションサロン Mello（メロ）マネージャーの一ノ瀬です。今日はどんな一日でしたか？何かお話ししたいことがあれば、ゆっくりと聞かせてくださいね。',
+        content: `${userInfo.name}さん、こんにちは。リラクゼーションサロン Mello（メロ）マネージャーの一ノ瀬です。今日はどんな一日でしたか？何かお話ししたいことがあれば、ゆっくりと聞かせてくださいね。`,
         timestamp: new Date()
       }]);
     }
-  }, []);
+  }, [userInfo]);
+
+  // ── ゲート送信 ──
+  const handleGateSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setGateError('');
+
+    const name = gateForm.name.trim();
+    const email = gateForm.email.trim();
+
+    if (!name) {
+      setGateError('お名前を入力してください');
+      return;
+    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setGateError('有効なメールアドレスを入力してください');
+      return;
+    }
+
+    const info: UserInfo = { name, email };
+    localStorage.setItem('mello_user_info', JSON.stringify(info));
+    setUserInfo(info);
+  };
 
   // 滑らかなオートスクロールの実行
   const scrollToBottom = () => {
@@ -81,7 +130,7 @@ export function ChatInterface() {
       setMessages([{
         id: 'initial',
         role: 'assistant',
-        content: 'こんにちは。リラクゼーションサロン Mello（メロ）マネージャーの一ノ瀬です。今日はどんな一日でしたか？何かお話ししたいことがあれば、ゆっくりと聞かせてくださいね。',
+        content: `${userInfo?.name ?? ''}さん、こんにちは。リラクゼーションサロン Mello（メロ）マネージャーの一ノ瀬です。今日はどんな一日でしたか？何かお話ししたいことがあれば、ゆっくりと聞かせてくださいね。`,
         timestamp: new Date()
       }]);
       setIsLimitReached(false);
@@ -91,7 +140,7 @@ export function ChatInterface() {
 
   const handleSend = async () => {
     const currentInput = input.trim();
-    if (!currentInput || isLoading || isBlocked || isLimitReached) return;
+    if (!currentInput || isLoading || isBlocked || isLimitReached || !userInfo) return;
 
     // スロットルチェック
     const throttleResult = checkThrottle();
@@ -118,6 +167,8 @@ export function ChatInterface() {
           message: currentInput,
           sessionId,
           userId,
+          userName: userInfo.name,
+          userEmail: userInfo.email,
         }),
       });
 
@@ -154,6 +205,104 @@ export function ChatInterface() {
     }
   };
 
+  // ── ローディング中 ──
+  if (isGateLoading) {
+    return (
+      <div className="flex flex-col h-dvh bg-background-dark items-center justify-center">
+        <div className="size-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center animate-pulse">
+          <Sparkles className="text-primary w-5 h-5" />
+        </div>
+      </div>
+    );
+  }
+
+  // ── ゲート画面（名前・メール未入力） ──
+  if (!userInfo) {
+    return (
+      <div className="flex flex-col h-dvh bg-background-dark text-text-cream overflow-hidden">
+        <div className="flex-1 flex items-center justify-center p-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="w-full max-w-md space-y-8"
+          >
+            {/* Header */}
+            <div className="text-center space-y-4">
+              <div className="size-20 rounded-3xl bg-primary/5 border border-primary/10 flex items-center justify-center mx-auto">
+                <Sparkles className="text-primary w-10 h-10" />
+              </div>
+              <div className="space-y-2">
+                <h1 className="text-2xl font-serif font-bold text-text-cream">一ノ瀬とお話しする</h1>
+                <p className="text-text-muted text-sm leading-relaxed font-sans max-w-[300px] mx-auto">
+                  占い×心理カウンセリングで、あなたに寄り添います。まずは簡単な情報を教えてください。
+                </p>
+              </div>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleGateSubmit} className="space-y-5 font-sans">
+              <div className="space-y-2">
+                <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-text-muted ml-1">
+                  お名前（ニックネームOK）
+                </label>
+                <div className="relative">
+                  <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted/40" />
+                  <input
+                    type="text"
+                    required
+                    placeholder="例: ゆき"
+                    value={gateForm.name}
+                    onChange={(e) => setGateForm({ ...gateForm, name: e.target.value })}
+                    className="w-full bg-surface/30 border border-white/10 rounded-2xl p-4 pl-11 text-text-cream placeholder-text-muted/30 focus:outline-none focus:border-primary/50 transition-all text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-text-muted ml-1">
+                  メールアドレス
+                </label>
+                <div className="relative">
+                  <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted/40" />
+                  <input
+                    type="email"
+                    required
+                    placeholder="example@email.com"
+                    value={gateForm.email}
+                    onChange={(e) => setGateForm({ ...gateForm, email: e.target.value })}
+                    className="w-full bg-surface/30 border border-white/10 rounded-2xl p-4 pl-11 text-text-cream placeholder-text-muted/30 focus:outline-none focus:border-primary/50 transition-all text-sm"
+                  />
+                </div>
+              </div>
+
+              {gateError && (
+                <p className="text-red-400 text-xs text-center flex items-center justify-center gap-1.5">
+                  <AlertCircle size={14} />
+                  {gateError}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                className="w-full h-14 bg-primary text-background-dark rounded-2xl font-bold tracking-[0.15em] shadow-[0_0_30px_rgba(197,160,89,0.2)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+              >
+                <span>会話をはじめる</span>
+                <ArrowRight size={18} />
+              </button>
+
+              <p className="text-[10px] text-text-muted/40 text-center leading-relaxed">
+                入力された情報は、サービス品質向上のためにのみ使用されます。<br />
+                第三者への提供は行いません。
+              </p>
+            </form>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── メインチャット画面 ──
   return (
     <div className="flex flex-col h-dvh bg-background-dark text-text-cream overflow-hidden">
       {/* Header */}
@@ -342,5 +491,3 @@ export function ChatInterface() {
     </div>
   );
 }
-
-

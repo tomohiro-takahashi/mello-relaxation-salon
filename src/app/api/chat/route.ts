@@ -3,6 +3,7 @@ import { getAdminDb } from '@/lib/firebase/admin';
 import { generateIchinoseResponse } from '@/lib/ai/ichinose';
 import { Conversation, ChatStage } from '@/types/database';
 import { nanoid } from 'nanoid';
+import { notifyChatSessionStarted, notifyChatSessionEnded } from '@/lib/utils/discord';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,6 +15,8 @@ const ChatRequestSchema = z.object({
   message: z.string().min(1).max(2000),
   sessionId: z.string().min(1),
   userId: z.string().min(1),
+  userName: z.string().optional(),
+  userEmail: z.string().email().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -25,7 +28,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid request data', details: result.error.format() }, { status: 400 });
     }
 
-    const { message, sessionId, userId } = result.data;
+    const { message, sessionId, userId, userName, userEmail } = result.data;
 
     const adminDb = getAdminDb();
     if (!adminDb) {
@@ -37,11 +40,15 @@ export async function POST(req: NextRequest) {
     const doc = await conversationRef.get();
 
     let conversation: Conversation;
+    let isNewSession = false;
 
     if (!doc.exists) {
+      isNewSession = true;
       conversation = {
         id: sessionId,
         userId,
+        userName: userName || '',
+        userEmail: userEmail || '',
         messages: [],
         summary: {
           emotionalState: [],
@@ -57,16 +64,40 @@ export async function POST(req: NextRequest) {
       };
     } else {
       conversation = doc.data() as Conversation;
+      // 既存セッションでもユーザー情報を更新
+      if (userName && !conversation.userName) {
+        conversation.userName = userName;
+      }
+      if (userEmail && !conversation.userEmail) {
+        conversation.userEmail = userEmail;
+      }
     }
 
     // 1.5 上限チェック（往復30回 = 計60メッセージ）
     if (conversation.messages.length >= MAX_MESSAGES_PER_SESSION) {
+      // 上限到達通知
+      notifyChatSessionEnded({
+        name: conversation.userName || '不明',
+        email: conversation.userEmail || '不明',
+        sessionId,
+        messageCount: conversation.messages.length,
+      }).catch(() => {}); // 通知失敗は無視
+
       return NextResponse.json({
         response: "今日はたくさんお話ししましたね。少し心を休めてから、また明日お話ししましょう。あなたとの会話、私も大切に覚えていますよ。もしよければ、実際にサロンでお会いしてお話しできたら、一ノ瀬も嬉しいな、って。予約フォーム、よかったら覗いてみてくださいね。",
         isLimitReached: true,
         stage: conversation.summary.stage,
         sessionId: conversation.id,
       });
+    }
+
+    // 1.6 新セッション開始通知（Discord）
+    if (isNewSession && userName && userEmail) {
+      notifyChatSessionStarted({
+        name: userName,
+        email: userEmail,
+        sessionId,
+      }).catch(() => {}); // 通知失敗は無視
     }
 
     // 2. AI応答の生成
@@ -81,7 +112,7 @@ export async function POST(req: NextRequest) {
     } catch (error: any) {
       if (error.message?.includes('429') || error.message?.includes('Quota exceeded')) {
         return NextResponse.json({ 
-          error: '本日のカウンセリング回数の上限に達しました。Google APIの無料枠制限（20回/日）によるものです。明日またお話しできるのを楽しみにしています。',
+          error: '現在アクセスが集中しています。少し時間をおいてからもう一度お試しください。',
           isQuotaExceeded: true 
         }, { status: 429 });
       }
@@ -89,6 +120,10 @@ export async function POST(req: NextRequest) {
     }
 
     const { response, updatedConversation } = aiResult;
+
+    // ユーザー情報を保持
+    updatedConversation.userName = conversation.userName;
+    updatedConversation.userEmail = conversation.userEmail;
 
     // 3. Firestore への保存
     await conversationRef.set({
